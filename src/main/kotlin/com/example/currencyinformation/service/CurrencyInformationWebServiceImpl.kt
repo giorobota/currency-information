@@ -14,6 +14,7 @@ import java.time.Duration
 private const val BASE_URL = "https://data.binance.com"
 private const val EXCHANGE_INFO_URL = "/api/v3/exchangeInfo"
 private const val PING_URL = "/api/v3/ping"
+private const val TIMEOUT_IN_SECONDS = 120L
 
 @Component
 internal class CurrencyInformationWebServiceImpl(
@@ -28,6 +29,7 @@ internal class CurrencyInformationWebServiceImpl(
                 .uri(PING_URL)
                 .retrieve()
                 .bodyToMono<String>()
+                .timeout(Duration.ofSeconds(TIMEOUT_IN_SECONDS))
                 .block()
     }
 
@@ -37,10 +39,10 @@ internal class CurrencyInformationWebServiceImpl(
                 .uri(EXCHANGE_INFO_URL)
                 .retrieve()
                 .bodyToMono<JsonNode>()
-                .timeout(Duration.ofSeconds(120))
+                .timeout(Duration.ofSeconds(TIMEOUT_IN_SECONDS))
                 .block()
 
-        return checkNotNull(response){
+        return checkNotNull(response) {
             "error receiving response for currency exchange info"
         }
     }

@@ -21,10 +21,14 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework:spring-websocket:6.0.4")
+    implementation("org.springframework:spring-messaging:6.0.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk-jvm:1.13.4")
 }
 
 tasks.withType<KotlinCompile> {
