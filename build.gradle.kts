@@ -18,6 +18,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("org.slf4j:slf4j-api")

@@ -1,32 +1,37 @@
 package com.example.currencyinformation.logger
 
-import com.example.currencyinformation.service.okhttp3.BINANCE_STREAM_URL
-import mu.KotlinLogging
+import com.example.currencyinformation.persistence.entity.CurrencyRule
+import com.example.currencyinformation.persistence.repository.CurrencyConfigRepository
+import com.example.currencyinformation.service.api.CurrencyInfoWebSocketService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.socket.WebSocketHandler
-import org.springframework.web.reactive.socket.WebSocketMessage
-import org.springframework.web.reactive.socket.WebSocketSession
-import org.springframework.web.reactive.socket.client.WebSocketClient
-import reactor.core.publisher.Mono
-import java.net.URI
+import kotlin.random.Random.Default as Random
+
 
 @Component
-class ExchangeInfoWebSocketLogger(
-        private val webSocketClient: WebSocketClient,
+internal class ExchangeInfoWebSocketLogger(
+        private val currencyInfoWebSocketService: CurrencyInfoWebSocketService,
+        private val currencyConfigRepository: CurrencyConfigRepository
 ) : CommandLineRunner {
 
-    private val logger = KotlinLogging.logger {}
 
-    override fun run(vararg args: String?) {
-        webSocketClient.execute(
-                URI(BINANCE_STREAM_URL)
-        ) { session ->
-            session.receive()
-                    .map(WebSocketMessage::getPayloadAsText)
-                    .doOnNext {
-                        logger.info { "received $it" }
-                    }.then()
-        }.block()
+    override fun run(vararg args: String?): Unit = runBlocking {
+        currencyConfigRepository.findAll().asFlow()
+                .filter { it.isEnabled && it.percent >= Random.nextInt(0, 100) }
+                .map { config ->
+                    val streamNames = config.rules.filter(CurrencyRule::isEnabled).map(CurrencyRule::streamName)
+                    launch {
+                        withContext(Dispatchers.IO) {
+                            currencyInfoWebSocketService.subscribeToStreams(streamNames).block()
+                        }
+                    }
+                }
     }
 }
