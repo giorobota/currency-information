@@ -5,6 +5,7 @@ import com.example.currencyinformation.persistence.repository.CurrencyConfigRepo
 import com.example.currencyinformation.service.api.CurrencyInfoWebSocketService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -23,9 +24,10 @@ internal class ExchangeInfoWebSocketLogger(
 
 
     override fun run(vararg args: String?): Unit = runBlocking {
-        currencyConfigRepository.findAll().asFlow()
+        currencyConfigRepository.findAll()
+                .asFlow()
                 .filter { it.isEnabled && it.percent >= Random.nextInt(0, 100) }
-                .map { config ->
+                .collect { config ->
                     val streamNames = config.rules.filter(CurrencyRule::isEnabled).map(CurrencyRule::streamName)
                     launch {
                         withContext(Dispatchers.IO) {
