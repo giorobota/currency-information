@@ -3,14 +3,9 @@ package com.example.currencyinformation.logger
 import com.example.currencyinformation.persistence.entity.CurrencyRule
 import com.example.currencyinformation.persistence.repository.CurrencyConfigRepository
 import com.example.currencyinformation.service.api.CurrencyInfoWebSocketService
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import kotlin.random.Random.Default as Random
@@ -23,17 +18,20 @@ internal class ExchangeInfoWebSocketLogger(
 ) : CommandLineRunner {
 
 
-    override fun run(vararg args: String?): Unit = runBlocking {
-        currencyConfigRepository.findAll()
-                .asFlow()
-                .filter { it.isEnabled && it.percent >= Random.nextInt(0, 100) }
-                .collect { config ->
-                    val streamNames = config.rules.filter(CurrencyRule::isEnabled).map(CurrencyRule::streamName)
-                    launch {
-                        withContext(Dispatchers.IO) {
-                            currencyInfoWebSocketService.subscribeToStreams(streamNames).block()
+    @OptIn(DelicateCoroutinesApi::class)
+    override fun run(vararg args: String?){
+        GlobalScope.launch {
+            currencyConfigRepository.findAll()
+                    .asFlow()
+                    .filter { it.isEnabled && it.percent >= Random.nextInt(0, 100) }
+                    .collect { config ->
+                        val streamNames = config.rules.filter(CurrencyRule::isEnabled).map(CurrencyRule::streamName)
+                        launch {
+                            withContext(Dispatchers.IO) {
+                                currencyInfoWebSocketService.subscribeToStreams(streamNames).block()
+                            }
                         }
                     }
-                }
+        }
     }
 }
