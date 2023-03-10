@@ -4,6 +4,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.0.3"
     id("io.spring.dependency-management") version "1.1.0"
+    id("io.ktor.plugin") version "2.2.3"
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
 }
@@ -32,6 +33,19 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk-jvm:1.13.4")
+}
+
+ktor {
+    docker {
+        jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)
+        portMappings.set(listOf(
+                io.ktor.plugin.features.DockerPortMapping(
+                        80,
+                        8080,
+                        io.ktor.plugin.features.DockerPortMappingProtocol.TCP
+                )
+        ))
+    }
 }
 
 tasks.withType<KotlinCompile> {

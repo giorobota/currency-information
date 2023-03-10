@@ -1,5 +1,15 @@
 FROM eclipse-temurin:19-jdk-alpine
-VOLUME /tmp
-ARG JAR_FILE
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+EXPOSE 8080:8080
+ADD "/build/libs/currency-information-0.0.1-SNAPSHOT.jar" "testdemo.jar"
+ENTRYPOINT ["java","-jar","/currency-information-0.0.1-SNAPSHOT.jar"]
+
+#FROM gradle:7-jdk19 AS build
+#COPY --chown=gradle:gradle . /home/gradle/src
+#WORKDIR /home/gradle/src
+#RUN gradle buildFatJar --no-daemon
+#
+#FROM openjdk:19
+#EXPOSE 8080:8080
+#RUN mkdir /app
+#COPY --from=build /home/gradle/src/build/libs/*.jar /app/ktor-docker-sample.jar
+#ENTRYPOINT ["java","-jar","/app/currency-information-0.0.1-SNAPSHOT.jar"]
