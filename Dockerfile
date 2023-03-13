@@ -1,7 +1,7 @@
 FROM eclipse-temurin:19-jdk-alpine
 EXPOSE 8080:8080
-ADD "/build/libs/currency-information-0.0.1-SNAPSHOT.jar" "testdemo.jar"
-ENTRYPOINT ["java","-jar","/currency-information-0.0.1-SNAPSHOT.jar"]
+ADD "/build/libs/currency-information-0.0.1-SNAPSHOT.jar" "test.jar"
+ENTRYPOINT ["java","-jar","/test.jar"]
 
 #FROM gradle:7-jdk19 AS build
 #COPY --chown=gradle:gradle . /home/gradle/src
