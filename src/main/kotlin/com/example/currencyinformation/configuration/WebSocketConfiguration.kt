@@ -1,4 +1,4 @@
-package com.example.currencyinformation
+package com.example.currencyinformation.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,7 +21,4 @@ class WebSocketConfiguration : WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/log")
         registry.addEndpoint("/log").withSockJS()
     }
-
-    @Bean
-    fun webSocketStompClient(): WebSocketClient = ReactorNettyWebSocketClient()
 }
